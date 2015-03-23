@@ -136,4 +136,4 @@ $("#pause").click(function() {
   Tone.Transport.stop();
 });
 
-sampleLoader('/samples/hihat.wav', context, enablePlay);
+sampleLoader('samples/hihat.wav', context, enablePlay);
