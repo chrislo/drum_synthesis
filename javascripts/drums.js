@@ -101,7 +101,8 @@ var sampleLoader = function(url, context, callback) {
 
   request.onload = function() {
     context.decodeAudioData(request.response, function(buffer) {
-      callback(buffer);
+      window.buffer = buffer;
+      callback();
     });
   };
 
@@ -110,10 +111,10 @@ var sampleLoader = function(url, context, callback) {
 
 var context = new AudioContext();
 
-var play = function(buffer) {
+var setup = function() {
   var kick  = new Kick(context);
   var snare = new Snare(context);
-  var hihat = new HiHat(context, buffer);
+  var hihat = new HiHat(context, window.buffer);
 
   Tone.Transport.bpm.value = 120;
 
@@ -121,19 +122,22 @@ var play = function(buffer) {
   Tone.Transport.setInterval(function(time){ snare.trigger(time) }, "2n");
   Tone.Transport.setInterval(function(time){ hihat.trigger(time) }, "8t");
 
-  Tone.Transport.start();
-};
-
-var enablePlay = function(buffer) {
   $("#play").removeClass('pure-button-disabled');
-
-  $("#play").click(function() {
-    play(buffer);
-  });
 };
 
 $("#pause").click(function() {
-  Tone.Transport.stop();
+  if (window.playing == true) {
+    window.playing = false;
+    Tone.Transport.stop();
+  }
 });
 
-sampleLoader('samples/hihat.wav', context, enablePlay);
+$("#play").click(function() {
+  if (window.playing == false) {
+    window.playing = true;
+    Tone.Transport.start();
+  }
+});
+
+window.playing = false;
+sampleLoader('samples/hihat.wav', context, setup);
